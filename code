@@ -1,0 +1,97 @@
+ 
+import csv
+import math
+import random
+import itertools
+from itertools import repeat
+import pprint
+
+pp = pprint.PrettyPrinter(indent=2)
+
+TOURNAMENT_PLAYERS = []
+
+with open('employees.csv', 'r') as f:
+    players = csv.reader(f)
+    for row in players:
+        TOURNAMENT_PLAYERS.append(row)
+
+
+TOURNAMENT_PLAYERS = TOURNAMENT_PLAYERS[1:]
+NUMBER_OF_PLAYERS = len(TOURNAMENT_PLAYERS)
+teams = [] 
+l = int(NUMBER_OF_PLAYERS/2)
+
+# DEFS
+def shuffle_players():
+    new_list_players_shuffled = TOURNAMENT_PLAYERS
+    random.shuffle(new_list_players_shuffled)
+    # print(new_list_players_shuffled)
+    return new_list_players_shuffled
+
+shuffle_players()
+
+
+
+def create_team(index, pair):
+    team = {
+        "teamName": "Team " + str(index), 
+        "players": pair,  
+        "wins": 0
+    }
+    
+    return team
+
+
+def create_teams():
+    # Fill this with the 32 teams(dictionary)
+    teams = []
+    # Add 2 players and run the create_teams(pair) and empty the list right after  
+    pair = []
+
+    shuffled = shuffle_players()
+
+    count = 0
+    for i in range(l):
+      pair.append(shuffled[count][1])
+      count = count + 1
+      # print(count)
+      pair.append(shuffled[count][1])
+      teams.append(create_team(i, pair) )
+      pair = []
+      count = count + 1
+    return teams
+   
+
+def determine_game_winner(opponents_list):
+  return random.choice(opponents_list)
+
+
+def pick_opponent_teams(teams):
+  pairs_to_play = int(len(teams) / 2)
+  opponents = []
+  winners = []
+  count = 0
+  for i in range(pairs_to_play):
+    opponents.append(teams[count])
+
+    count = count + 1
+    opponents.append(teams[count])
+
+    winner = determine_game_winner(opponents)
+    winner['wins'] = winner['wins'] + 1
+
+    winners.append(winner)
+
+    opponents = []
+    count = count + 1
+
+  # print(winners)
+  pp.pprint(winners)
+  if len(winners) > 1:
+    pick_opponent_teams(winners)
+
+
+tournament_teams = create_teams()
+random.shuffle(tournament_teams)
+
+pick_opponent_teams(tournament_teams)
